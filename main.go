@@ -48,7 +48,7 @@ func (g *Game) Update() error {
 	g.blocks = updateBlocks(g.blocks)
 
 	for _, block := range g.blocks {
-		if block.GetRectangle().Overlaps(g.player.GetRectangle()) {
+		if block.Bounds().Overlaps(g.player.Bounds()) {
 			*g = NewGame()
 		}
 	}
@@ -64,10 +64,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// draw background
 	drawBackground(screen, g.frame, 0, 3)
 	drawBackground(screen, g.frame, 1, 2)
-	drawBackground(screen, g.frame, 2, 1)
 
 	drawPlayer(screen, g)
 	drawBlocks(screen, g)
+
+	drawBackground(screen, g.frame, 2, 1)
 
 	if ebiten.IsKeyPressed(ebiten.KeyF2) {
 		drawDebug(screen, g)

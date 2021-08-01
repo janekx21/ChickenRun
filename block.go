@@ -57,6 +57,6 @@ func updateBlocks(blocks Blocks) Blocks {
 	return blocks.filterDead()
 }
 
-func (b Block) GetRectangle() image.Rectangle {
+func (b Block) Bounds() image.Rectangle {
 	return image.Rect(int(b.locationX), 96, S+int(b.locationX), S+96)
 }

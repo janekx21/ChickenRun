@@ -23,13 +23,14 @@ func drawWiredRectangle(screen *ebiten.Image, x, y, w, h float64, color color.Co
 	ebitenutil.DrawLine(screen, x+w, y, x+w, y+h, color)
 	ebitenutil.DrawLine(screen, x, y+h, x+w, y+h, color)
 }
+
 func drawDebug(screen *ebiten.Image, g *Game) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("cap(g.blocks) = %d", cap(g.blocks)))
 
-	drawWiredRectangleRect(screen, g.player.GetRectangle(), colornames.Green)
+	drawWiredRectangleRect(screen, g.player.Bounds(), colornames.Green)
 	for _, block := range g.blocks {
-		drawWiredRectangleRect(screen, block.GetRectangle(), colornames.Red)
-		if block.GetRectangle().Overlaps(g.player.GetRectangle()) {
+		drawWiredRectangleRect(screen, block.Bounds(), colornames.Red)
+		if block.Bounds().Overlaps(g.player.Bounds()) {
 			ebitenutil.DebugPrint(screen, "Game Over!")
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
+	"math"
 )
 
 var (
@@ -51,11 +52,27 @@ func drawPlayer(screen *ebiten.Image, g *Game) {
 	if g.player.onGround {
 		screen.DrawImage(playerNotMoveAnimation[g.frame/8%4], op)
 	} else {
-		screen.DrawImage(playerJumpAnimation[g.frame/8%3], op)
+		state := sgn(math.Round(g.player.velocityY))
+		stateToFrame := map[int]int{
+			-1: 2,
+			0:  1,
+			1:  0,
+		}
+		screen.DrawImage(playerJumpAnimation[stateToFrame[state]], op)
 	}
 }
 
-func (p Player) GetRectangle() image.Rectangle {
+func sgn(a float64) int {
+	switch {
+	case a < 0:
+		return -1
+	case a > 0:
+		return +1
+	}
+	return 0
+}
+
+func (p Player) Bounds() image.Rectangle {
 	x, y := S*4+4, 96-int(p.locationY)+6
 	return image.Rect(x, y, x+S-8, y+S-6)
 }
