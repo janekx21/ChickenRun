@@ -36,7 +36,7 @@ func updatePlayer(player Player) Player {
 		player.velocityY = 0
 		player.locationY = 0
 
-		if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		if ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsGamepadButtonPressed(0, ebiten.GamepadButton0) || ebiten.GamepadAxis(0, 1) < -.5 {
 			player.velocityY = 3
 		}
 	}

@@ -88,9 +88,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	w, h := ebiten.ScreenSizeInFullscreen()
+	ebiten.SetWindowSize(w, h)
+	ebiten.SetFullscreen(true)
+
 	ebiten.SetWindowTitle("Chicken Run")
-	ebiten.SetWindowResizable(true)
 	if err := ebiten.RunGame(&Game{player: Player{}, blocks: make(Blocks, 0)}); err != nil {
 		log.Fatal(err)
 	}
