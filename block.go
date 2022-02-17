@@ -3,11 +3,12 @@ package main
 import (
 	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2"
+	"golang.org/x/image/math/f64"
 	"image"
 )
 
 var (
-	//go:embed Tile_7.png
+	//go:embed asset/Tile_7.png
 	tile7 []byte
 )
 
@@ -20,8 +21,8 @@ func init() {
 }
 
 type Block struct {
-	locationX float64
-	dead      bool
+	pos  f64.Vec2
+	dead bool
 }
 
 type Blocks []Block
@@ -39,17 +40,17 @@ func (b Blocks) filterDead() Blocks {
 func drawBlocks(screen *ebiten.Image, g *Game) {
 	for _, block := range g.blocks {
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(block.locationX, 96)
+		op.GeoM.Translate(block.pos[0], block.pos[1])
 		screen.DrawImage(blockImage, op)
 	}
 }
 
-func updateBlocks(blocks Blocks) Blocks {
+func updateBlocks(blocks Blocks, dt float64) Blocks {
 	for i := range blocks {
 		block := &blocks[i]
-		block.locationX -= 1
-		if block.locationX < -16 {
-			block.locationX = WIDTH
+		block.pos[0] -= dt * 60
+		if block.pos[0] < -16 {
+			block.pos[0] = WIDTH
 			block.dead = true
 		}
 	}
@@ -58,5 +59,5 @@ func updateBlocks(blocks Blocks) Blocks {
 }
 
 func (b Block) Bounds() image.Rectangle {
-	return image.Rect(int(b.locationX), 96, S+int(b.locationX), S+96)
+	return image.Rect(int(b.pos[0]), int(b.pos[1]), S+int(b.pos[0]), int(S+b.pos[1]))
 }

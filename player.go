@@ -8,40 +8,65 @@ import (
 )
 
 var (
-	//go:embed Player_notmove.png
+	//go:embed asset/Player_notmove.png
 	playerNotMove []byte
-	//go:embed Player_jump.png
+	//go:embed asset/Player_jump.png
 	playerJump []byte
+	//go:embed asset/Player_hover.png
+	playerHover []byte
 )
 
 var (
 	playerNotMoveAnimation [4]*ebiten.Image
 	playerJumpAnimation    [4]*ebiten.Image
+	playerHoverImg         *ebiten.Image
 )
 
 func init() {
 	playerNotMoveAnimation = decodeImageArray(playerNotMove)
 	playerJumpAnimation = decodeImageArray(playerJump)
+	playerHoverImg = decodeImage(playerHover)
 }
 
 type Player struct {
-	onGround  bool
-	locationY float64
-	velocityY float64
+	onGround   bool
+	blockHover bool
+	hover      bool
+	locationY  float64
+	velocityY  float64
+}
+
+func jumpDown() bool {
+	return ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsGamepadButtonPressed(0, ebiten.GamepadButton0) || ebiten.GamepadAxis(0, 1) < -.5
 }
 
 func updatePlayer(player Player) Player {
 	player.onGround = player.locationY <= 0
+	player.hover = false
+
 	if player.onGround {
 		player.velocityY = 0
 		player.locationY = 0
 
-		if ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsGamepadButtonPressed(0, ebiten.GamepadButton0) || ebiten.GamepadAxis(0, 1) < -.5 {
-			player.velocityY = 3
+		if jumpDown() {
+			player.velocityY = 4.6
+			player.blockHover = true
+		}
+	} else {
+		if jumpDown() {
+			if !player.blockHover {
+				player.hover = true
+			}
+		} else {
+			player.blockHover = false
 		}
 	}
 
-	player.velocityY -= .1
+	if player.hover {
+		player.velocityY = -.2
+	} else {
+		player.velocityY -= .2
+	}
 	player.locationY += player.velocityY
 	return player
 }
@@ -50,15 +75,19 @@ func drawPlayer(screen *ebiten.Image, g *Game) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(S*4, 96-g.player.locationY)
 	if g.player.onGround {
-		screen.DrawImage(playerNotMoveAnimation[g.frame/8%4], op)
+		screen.DrawImage(playerNotMoveAnimation[int(g.time*60)/8%4], op)
 	} else {
-		state := sgn(math.Round(g.player.velocityY))
-		stateToFrame := map[int]int{
-			-1: 2,
-			0:  1,
-			1:  0,
+		if g.player.hover {
+			screen.DrawImage(playerHoverImg, op)
+		} else {
+			state := sgn(math.Round(g.player.velocityY))
+			stateToFrame := map[int]int{
+				-1: 2,
+				0:  1,
+				1:  0,
+			}
+			screen.DrawImage(playerJumpAnimation[stateToFrame[state]], op)
 		}
-		screen.DrawImage(playerJumpAnimation[stateToFrame[state]], op)
 	}
 }
 
