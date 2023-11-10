@@ -9,6 +9,8 @@ import (
 	"math/rand"
 )
 
+//go:generate goversioninfo -icon="icon.ico"
+
 const S = 16
 const WIDTH = 160
 const HEIGHT = 144
