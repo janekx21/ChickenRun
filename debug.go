@@ -34,4 +34,8 @@ func drawDebug(screen *ebiten.Image, g *Game) {
 			ebitenutil.DebugPrint(screen, "Game Over!")
 		}
 	}
+
+	for _, coin := range g.coins {
+		drawWiredRectangleRect(screen, coin.Bounds(), colornames.Yellow)
+	}
 }
